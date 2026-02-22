@@ -1,10 +1,13 @@
+import "dotenv/config";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from '@repo/backend-common/config';
-import { middleware } from "./middleware";
+import { middleware } from "./middleware.js";
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 import bcrypt from "bcrypt";
+
+
 
 const app = express();
 app.use(express.json());
@@ -32,6 +35,7 @@ app.post("/signup", async (req, res) => {
             userId: user.id
         })
     } catch(e) {
+        console.log("Real error" , e);
         res.status(411).json({
             message: "User already exists with this username"
         })
@@ -145,4 +149,4 @@ app.get("/room/:slug", async (req, res) => {
     })
 })
 
-app.listen(3001);
+app.listen(3002);

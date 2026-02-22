@@ -1,7 +1,10 @@
+import "dotenv/config";
 import { WebSocket, WebSocketServer } from 'ws';
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from '@repo/backend-common/config';
-import { prismaClient } from "@repo/db";
+import { prismaClient } from "@repo/db/client";
+
+
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -53,11 +56,13 @@ wss.on('connection', function connection(ws, request) {
   })
 
   ws.on('message', async function message(data) {
+  try {
+    // Parse incoming data whether it arrives as a Buffer or a string
     let parsedData;
     if (typeof data !== "string") {
       parsedData = JSON.parse(data.toString());
     } else {
-      parsedData = JSON.parse(data); // {type: "join-room", roomId: 1}
+      parsedData = JSON.parse(data);
     }
 
     if (parsedData.type === "join_room") {
@@ -67,19 +72,15 @@ wss.on('connection', function connection(ws, request) {
 
     if (parsedData.type === "leave_room") {
       const user = users.find(x => x.ws === ws);
-      if (!user) {
-        return;
-      }
-      user.rooms = user?.rooms.filter(x => x !== parsedData.room);
+      if (!user) return;
+      user.rooms = user.rooms.filter(x => x !== parsedData.room);
     }
-
-    console.log("message received")
-    console.log(parsedData);
 
     if (parsedData.type === "chat") {
       const roomId = parsedData.roomId;
       const message = parsedData.message;
 
+      // Persist the message to the database
       await prismaClient.chat.create({
         data: {
           roomId: Number(roomId),
@@ -88,17 +89,22 @@ wss.on('connection', function connection(ws, request) {
         }
       });
 
+      // Broadcast to everyone in the same room
       users.forEach(user => {
         if (user.rooms.includes(roomId)) {
           user.ws.send(JSON.stringify({
             type: "chat",
             message: message,
             roomId
-          }))
+          }));
         }
-      })
+      });
     }
 
-  });
+  } catch (error) {
+    // Log the error but don't let it kill the server process
+    console.error("WebSocket message error:", error);
+  }
+});
 
 });
