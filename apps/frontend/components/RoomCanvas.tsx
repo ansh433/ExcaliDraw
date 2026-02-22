@@ -1,35 +1,41 @@
 "use client";
 
 import { WS_URL } from "@/config";
-import { initDraw } from "@/draw";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Canvas } from "./Canvas";
 
-export function RoomCanvas({roomId}: {roomId: string}) {
-    const [socket, setSocket] = useState<WebSocket | null>(null);
+export function RoomCanvas({ roomId }: { roomId: string }) {
+  const router = useRouter();
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
-    useEffect(() => {
-        const ws = new WebSocket(`${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3Njg0NDMwYy04YzNiLTRlZmQtOGFmNS00YzQwMzdmNjJkYzMiLCJpYXQiOjE3MzcyOTg2NjV9.xacFop0s231DoUVeLZormeIbBmIRaXftTVVI6weIqFo`)
-
-        ws.onopen = () => {
-            setSocket(ws);
-            const data = JSON.stringify({
-                type: "join_room",
-                roomId
-            });
-            console.log(data);
-            ws.send(data)
-        }
-        
-    }, [])
-   
-    if (!socket) {
-        return <div>
-            Connecting to server....
-        </div>
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/signin");
+      return;
     }
 
-    return <div>
-        <Canvas roomId={roomId} socket={socket} />
-    </div>
+    const ws = new WebSocket(`${WS_URL}?token=${token}`);
+
+    ws.onopen = () => {
+      setSocket(ws);
+      ws.send(JSON.stringify({ type: "join_room", roomId }));
+    };
+
+    ws.onclose = () => setSocket(null);
+
+    return () => ws.close();
+  }, [roomId, router]);
+
+  if (!socket) {
+    return (
+      <div className="w-screen h-screen bg-black flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-main border-t-transparent rounded-full animate-spin" />
+        <p className="text-white/50 font-base text-sm">Connecting to canvas...</p>
+      </div>
+    );
+  }
+
+  return <Canvas roomId={roomId} socket={socket} />;
 }
