@@ -115,6 +115,8 @@ app.get("/room/:slug", async (req, res) => {
     res.json({ room });
 });
 
-app.listen(3002, () => {
-    console.log("http-backend running on port 3002");
+const PORT = process.env.PORT || 3002;
+
+app.listen(PORT, () => {
+    console.log(`http-backend running on port ${PORT}`);
 });
