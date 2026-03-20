@@ -10,10 +10,29 @@ import bcrypt from "bcrypt";
 
 const app = express();
 app.use(express.json());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:3000"
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
+  origin: function (origin, callback) {
+    console.log("Incoming Origin:", origin);
+    console.log("Allowed Origins:", allowedOrigins);
+
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log("❌ BLOCKED BY CORS");
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
+app.options("*", cors());
 
 app.post("/signup", async (req, res) => {
     const parsedData = CreateUserSchema.safeParse(req.body);
