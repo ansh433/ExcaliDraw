@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 
 const app = express();
 app.use(express.json());
+
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:3000"
@@ -20,6 +21,7 @@ app.use(cors({
     console.log("Incoming Origin:", origin);
     console.log("Allowed Origins:", allowedOrigins);
 
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -31,10 +33,7 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+
 app.post("/signup", async (req, res) => {
     const parsedData = CreateUserSchema.safeParse(req.body);
     if (!parsedData.success) {
@@ -99,7 +98,6 @@ app.post("/room", middleware, async (req, res) => {
     }
 });
 
-// NEW: get all rooms for the logged-in user
 app.get("/rooms", middleware, async (req, res) => {
     const userId = (req as any).userId;
     try {
