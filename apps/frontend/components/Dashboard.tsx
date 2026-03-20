@@ -13,8 +13,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CreateRoomModal } from "./CreateRoomModal";
+import { JoinRoomModal } from "./JoinRoomModal";
 import { getRooms } from "@/draw/http";
-import { Plus, LogOut, ArrowRight } from "lucide-react";
+import { Plus, LogOut, ArrowRight, Search } from "lucide-react";
 
 type Room = {
   id: number;
@@ -26,7 +27,10 @@ export function Dashboard() {
   const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // State for both modals
   const [modalOpen, setModalOpen] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -66,6 +70,10 @@ export function Dashboard() {
           Drawly
         </span>
         <div className="flex items-center gap-3">
+          <Button variant="neutral" onClick={() => setJoinModalOpen(true)}>
+            <Search size={16} />
+            Join Room
+          </Button>
           <Button onClick={() => setModalOpen(true)}>
             <Plus size={16} />
             New Room
@@ -111,9 +119,14 @@ export function Dashboard() {
             <p className="text-sm font-base text-foreground/60">
               Create your first room to start drawing
             </p>
-            <Button onClick={() => setModalOpen(true)}>
-              Create a room
-            </Button>
+            <div className="flex gap-4 mt-2">
+              <Button onClick={() => setModalOpen(true)}>
+                Create a room
+              </Button>
+              <Button variant="neutral" onClick={() => setJoinModalOpen(true)}>
+                Join a room
+              </Button>
+            </div>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -155,10 +168,15 @@ export function Dashboard() {
         )}
       </main>
 
+      {/* Modals */}
       <CreateRoomModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onCreated={fetchRooms}
+      />
+      <JoinRoomModal
+        open={joinModalOpen}
+        onClose={() => setJoinModalOpen(false)}
       />
     </div>
   );

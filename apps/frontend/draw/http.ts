@@ -42,3 +42,13 @@ export async function signup(username: string, password: string, name: string): 
     const res = await axios.post(`${HTTP_BACKEND}/signup`, { username, password, name });
     return res.data.token;
 }
+
+export async function getRoom(slug: string) {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(`${HTTP_BACKEND}/room/${slug}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return res.data.room;
+}
