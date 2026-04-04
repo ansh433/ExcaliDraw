@@ -4,10 +4,8 @@ import { motion, type Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Pencil, Users, Zap } from "lucide-react";
 
-// The fixed fadeUp object with proper TypeScript typing for the easing array
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -16,7 +14,7 @@ const fadeUp: Variants = {
     transition: {
       delay: i * 0.12,
       duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as const, 
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   }),
 };
@@ -72,80 +70,85 @@ export default function LandingPage() {
         </motion.div>
       </nav>
 
-      {/* Hero */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-28 flex-1">
-        <motion.div
-          custom={0}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-        >
-          <Badge className="mb-6 text-sm px-4 py-1">
-            Now in beta — free forever
-          </Badge>
-        </motion.div>
+      {/* Hero — two-column grid */}
+      <section className="flex-1 px-6 py-24">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-        <motion.h1
-          custom={1}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="text-6xl font-heading leading-tight max-w-3xl"
-        >
-          Draw together,{" "}
-          <span className="bg-main px-2 border-2 border-border inline-block">
-            in real time
-          </span>
-        </motion.h1>
+          {/* LEFT: headings + para + CTA */}
+          <div className="flex flex-col items-start text-left">
+            <motion.h1
+              custom={0}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="text-5xl font-heading leading-tight bg-main px-2 border-2 border-border inline-block"
+            >
+              Draw together
+              
+            </motion.h1>
 
-        <motion.p
-          custom={2}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="mt-6 text-lg max-w-xl text-foreground/70 font-base"
-        >
-          Drawly is a multiplayer canvas where teams sketch, diagram, and
-          brainstorm — all synced live, no setup required.
-        </motion.p>
+            <motion.h2
+              custom={1}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-4 text-xl font-heading text-foreground/70"
+            >
+              Your canvas. Your team. Zero friction.
+            </motion.h2>
 
-        <motion.div
-          custom={3}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="mt-10 flex gap-4"
-        >
-          <Button size="lg" onClick={() => router.push("/signup")}>
-            Start drawing free
-          </Button>
-          <Button
-            size="lg"
-            variant="neutral"
-            onClick={() => router.push("/signin")}
+            <motion.p
+              custom={2}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-4 text-base max-w-md text-foreground/60 font-base"
+            >
+              Drawly is a multiplayer canvas where teams sketch, diagram, and
+              brainstorm — all synced live, no setup required.
+            </motion.p>
+
+            <motion.div
+              custom={3}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-8 flex gap-4"
+            >
+              <Button size="lg" onClick={() => router.push("/signup")}>
+                Start drawing free
+              </Button>
+              <Button
+                size="lg"
+                variant="neutral"
+                onClick={() => router.push("/signin")}
+              >
+                Sign in
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* RIGHT: canvas preview */}
+          <motion.div
+            custom={4}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="w-full h-80 bg-black border-2 border-border shadow-shadow rounded-base flex items-center justify-center relative overflow-hidden"
+            aria-label="Live canvas preview showing collaborative drawing"
           >
-            Sign in
-          </Button>
-        </motion.div>
+            <svg width="100%" height="100%" className="absolute inset-0">
+              <rect x="40" y="40" width="110" height="75" fill="none" stroke="white" strokeWidth="2" />
+              <circle cx="240" cy="110" r="55" fill="none" stroke="#3B82F6" strokeWidth="2" />
+              <rect x="340" y="55" width="90" height="90" fill="none" stroke="white" strokeWidth="2" />
+              <circle cx="340" cy="240" r="55" fill="none" stroke="#3B82F6" strokeWidth="2" />
+              <rect x="140" y="200" width="110" height="75" fill="none" stroke="white" strokeWidth="2" />
 
-        {/* Mock canvas preview */}
-        <motion.div
-          custom={4}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="mt-16 w-full max-w-3xl h-64 bg-black border-2 border-border shadow-shadow rounded-base flex items-center justify-center relative overflow-hidden"
-        >
-          <svg width="100%" height="100%" className="absolute inset-0">
-            <rect x="60" y="40" width="120" height="80" fill="none" stroke="white" strokeWidth="2" />
-            <circle cx="320" cy="100" r="50" fill="none" stroke="#3B82F6" strokeWidth="2" />
-            <rect x="480" y="60" width="100" height="100" fill="none" stroke="white" strokeWidth="2" />
-            <line x1="60" y1="160" x2="600" y2="200" stroke="#3B82F6" strokeWidth="1.5" strokeDasharray="6 4" />
-          </svg>
-          <span className="text-white/30 font-base text-sm z-10">
-            live canvas preview
-          </span>
-        </motion.div>
+            </svg>
+          
+          </motion.div>
+
+        </div>
       </section>
 
       {/* Features */}
